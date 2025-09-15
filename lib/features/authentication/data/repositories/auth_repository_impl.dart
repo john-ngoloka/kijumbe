@@ -2,221 +2,255 @@ import 'package:dartz/dartz.dart';
 import 'package:injectable/injectable.dart';
 import '../../../../core/errors/exceptions.dart';
 import '../../../../core/errors/failures.dart';
-import '../../../../core/network/network_info.dart';
-import '../../../../core/utils/result.dart';
+import '../../../../core/repositories/base_repository.dart';
+import '../../../../core/services/jwt_service.dart';
 import '../../domain/entities/auth_tokens.dart';
 import '../../domain/entities/user.dart';
 import '../../domain/repositories/auth_repository.dart';
 import '../datasources/local/auth_local_datasource.dart';
-import '../datasources/remote/auth_remote_datasource.dart';
+import '../models/auth_tokens_model.dart';
 import '../models/user_model.dart';
 
 @LazySingleton(as: AuthRepository)
-class AuthRepositoryImpl implements AuthRepository {
-  final AuthRemoteDataSource _remoteDataSource;
+class AuthRepositoryImpl extends BaseRepository implements AuthRepository {
   final AuthLocalDataSource _localDataSource;
-  final NetworkInfo _networkInfo;
+  final JWTService _jwtService;
 
-  AuthRepositoryImpl(
-    this._remoteDataSource,
-    this._localDataSource,
-    this._networkInfo,
-  );
+  AuthRepositoryImpl(this._localDataSource, this._jwtService);
 
   @override
-  Future<Result<AuthTokens>> login({
+  Future<Either<Failure, AuthTokens>> signup({
+    required String phone,
+    required String password,
+    required String name,
+  }) async {
+    final result = await handleException(() async {
+      // Check if user already exists
+      final userExists = await _localDataSource.userExists(phone);
+      if (userExists) {
+        throw AuthenticationException(
+          message: 'User with this phone number already exists',
+          statusCode: 409,
+        );
+      }
+
+      // Create new user
+      final userId = _jwtService.generateUserId();
+      final userModel = UserModel(
+        id: userId.toString(),
+        phone: phone,
+        email: null,
+        firstName: name.split(' ').first,
+        lastName: name.split(' ').length > 1
+            ? name.split(' ').skip(1).join(' ')
+            : '',
+        profileImage: null,
+        createdAt: DateTime.now(),
+        updatedAt: DateTime.now(),
+        isActive: true,
+      );
+
+      // Save user to Isar database
+      final createdUser = await _localDataSource.createUser(userModel);
+
+      // Generate JWT tokens
+      final accessToken = _jwtService.generateAccessToken(
+        userId: userId,
+        phone: phone,
+        name: name,
+      );
+      final refreshToken = _jwtService.generateRefreshToken(
+        userId: userId,
+        phone: phone,
+      );
+
+      final tokensModel = AuthTokensModel(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        expiresIn: 3600, // 1 hour
+      );
+
+      // Save tokens and user data locally
+      await _localDataSource.saveAuthTokens(tokensModel);
+      await _localDataSource.saveUserData(createdUser);
+      await _localDataSource.setLoggedIn(true);
+
+      return tokensModel.toEntity();
+    }, operationName: 'signup');
+
+    return result.fold((failure) => Left(failure), (tokens) => Right(tokens));
+  }
+
+  @override
+  Future<Either<Failure, AuthTokens>> login({
     required String phone,
     required String password,
   }) async {
-    if (await _networkInfo.isConnected) {
-      try {
-        final tokensModel = await _remoteDataSource.login(
-          phone: phone,
-          password: password,
+    final result = await handleException(() async {
+      // Get user from local database
+      final userModel = await _localDataSource.getUserByPhone(phone);
+      if (userModel == null) {
+        throw AuthenticationException(
+          message: 'User not found. Please signup first.',
+          statusCode: 404,
         );
-
-        // Save tokens locally
-        await _localDataSource.saveAuthTokens(tokensModel);
-        await _localDataSource.setLoggedIn(true);
-
-        return Right(tokensModel.toEntity());
-      } on ServerException catch (e) {
-        return Left(
-          ServerFailure(message: e.message, statusCode: e.statusCode),
-        );
-      } on NetworkException catch (e) {
-        return Left(NetworkFailure(message: e.message));
-      } on AuthenticationException catch (e) {
-        return Left(
-          AuthenticationFailure(message: e.message, statusCode: e.statusCode),
-        );
-      } on CacheException catch (e) {
-        return Left(CacheFailure(message: e.message));
-      } catch (e) {
-        return Left(UnknownFailure(message: e.toString()));
       }
-    } else {
-      return const Left(NetworkFailure(message: 'No internet connection'));
-    }
+
+      // In a real app, you would verify the password hash here
+      // For simulation, we'll just check if password is not empty
+      if (password.isEmpty) {
+        throw AuthenticationException(
+          message: 'Invalid password',
+          statusCode: 401,
+        );
+      }
+
+      // Generate JWT tokens
+      final accessToken = _jwtService.generateAccessToken(
+        userId: int.parse(userModel.id),
+        phone: userModel.phone,
+        name: '${userModel.firstName} ${userModel.lastName}',
+      );
+      final refreshToken = _jwtService.generateRefreshToken(
+        userId: int.parse(userModel.id),
+        phone: userModel.phone,
+      );
+
+      final tokensModel = AuthTokensModel(
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        expiresIn: 3600, // 1 hour
+      );
+
+      // Save tokens and user data locally
+      await _localDataSource.saveAuthTokens(tokensModel);
+      await _localDataSource.saveUserData(userModel);
+      await _localDataSource.setLoggedIn(true);
+
+      return tokensModel.toEntity();
+    }, operationName: 'login');
+
+    return result.fold((failure) => Left(failure), (tokens) => Right(tokens));
   }
 
   @override
-  Future<ResultVoid> logout() async {
-    if (await _networkInfo.isConnected) {
-      try {
-        await _remoteDataSource.logout();
-      } catch (e) {
-        // Continue with local logout even if remote logout fails
-      }
-    }
-
-    try {
+  Future<Either<Failure, void>> logout() async {
+    final result = await handleVoidException(() async {
       await _localDataSource.clearAuthTokens();
       await _localDataSource.clearUserData();
       await _localDataSource.setLoggedIn(false);
-      return const Right(null);
-    } on CacheException catch (e) {
-      return Left(CacheFailure(message: e.message));
-    } catch (e) {
-      return Left(UnknownFailure(message: e.toString()));
-    }
+    }, operationName: 'logout');
+
+    return result.fold((failure) => Left(failure), (_) => const Right(null));
   }
 
   @override
-  Future<Result<AuthTokens>> refreshToken() async {
-    try {
+  Future<Either<Failure, AuthTokens>> refreshToken() async {
+    final result = await handleException(() async {
       final tokensModel = await _localDataSource.getAuthTokens();
       if (tokensModel == null) {
-        return const Left(
-          AuthenticationFailure(message: 'No refresh token found'),
+        throw AuthenticationException(
+          message: 'No refresh token found',
+          statusCode: 401,
         );
       }
 
-      if (await _networkInfo.isConnected) {
-        try {
-          final newTokensModel = await _remoteDataSource.refreshToken(
-            tokensModel.refreshToken,
-          );
+      // Check if refresh token is expired
+      if (_jwtService.isTokenExpired(tokensModel.refreshToken)) {
+        throw AuthenticationException(
+          message: 'Refresh token expired',
+          statusCode: 401,
+        );
+      }
 
-          await _localDataSource.saveAuthTokens(newTokensModel);
-          return Right(newTokensModel.toEntity());
-        } on ServerException catch (e) {
-          return Left(
-            ServerFailure(message: e.message, statusCode: e.statusCode),
-          );
-        } on NetworkException catch (e) {
-          return Left(NetworkFailure(message: e.message));
-        } on AuthenticationException catch (e) {
-          return Left(
-            AuthenticationFailure(message: e.message, statusCode: e.statusCode),
-          );
-        }
+      // Generate new access token using refresh token
+      final newAccessToken = _jwtService.refreshAccessToken(
+        tokensModel.refreshToken,
+      );
+      if (newAccessToken == null) {
+        throw AuthenticationException(
+          message: 'Failed to refresh access token',
+          statusCode: 401,
+        );
+      }
+
+      final newTokensModel = AuthTokensModel(
+        accessToken: newAccessToken,
+        refreshToken: tokensModel.refreshToken,
+        expiresIn: 3600, // 1 hour
+      );
+
+      await _localDataSource.saveAuthTokens(newTokensModel);
+      return newTokensModel.toEntity();
+    }, operationName: 'refresh token');
+
+    return result.fold((failure) => Left(failure), (tokens) => Right(tokens));
+  }
+
+  @override
+  Future<Either<Failure, User>> getCurrentUser() async {
+    final result = await handleException(() async {
+      final cachedUserModel = await _localDataSource.getCachedUser();
+      if (cachedUserModel != null) {
+        return cachedUserModel.toEntity();
       } else {
-        return const Left(NetworkFailure(message: 'No internet connection'));
+        throw CacheException(message: 'No cached user data');
       }
-    } on CacheException catch (e) {
-      return Left(CacheFailure(message: e.message));
-    } catch (e) {
-      return Left(UnknownFailure(message: e.toString()));
-    }
+    }, operationName: 'get current user');
+
+    return result.fold((failure) => Left(failure), (user) => Right(user));
   }
 
   @override
-  Future<Result<User>> getCurrentUser() async {
-    if (await _networkInfo.isConnected) {
-      try {
-        final userModel = await _remoteDataSource.getCurrentUser();
-        await _localDataSource.saveUserData(userModel);
-        return Right(userModel.toEntity());
-      } on ServerException catch (e) {
-        return Left(
-          ServerFailure(message: e.message, statusCode: e.statusCode),
-        );
-      } on NetworkException catch (e) {
-        return Left(NetworkFailure(message: e.message));
-      } on AuthenticationException catch (e) {
-        return Left(
-          AuthenticationFailure(message: e.message, statusCode: e.statusCode),
-        );
-      } catch (e) {
-        return Left(UnknownFailure(message: e.toString()));
-      }
-    } else {
-      // Return cached user if no network
-      try {
-        final cachedUserModel = await _localDataSource.getCachedUser();
-        if (cachedUserModel != null) {
-          return Right(cachedUserModel.toEntity());
-        } else {
-          return const Left(CacheFailure(message: 'No cached user data'));
-        }
-      } on CacheException catch (e) {
-        return Left(CacheFailure(message: e.message));
-      }
-    }
-  }
-
-  @override
-  Future<Result<bool>> isLoggedIn() async {
-    try {
+  Future<Either<Failure, bool>> isLoggedIn() async {
+    final result = await handleException(() async {
       final isLoggedIn = await _localDataSource.isLoggedIn();
       final tokens = await _localDataSource.getAuthTokens();
 
       if (isLoggedIn && tokens != null) {
         // Check if token is expired
-        final tokensEntity = tokens.toEntity();
-        if (tokensEntity.isExpired) {
+        if (_jwtService.isTokenExpired(tokens.accessToken)) {
           // Try to refresh token
           final refreshResult = await refreshToken();
-          return refreshResult.fold(
-            (failure) => const Right(false),
-            (newTokens) => const Right(true),
-          );
+          return refreshResult.fold((failure) => false, (newTokens) => true);
         }
-        return const Right(true);
+        return true;
       }
-      return const Right(false);
-    } on CacheException catch (e) {
-      return Left(CacheFailure(message: e.message));
-    } catch (e) {
-      return Left(UnknownFailure(message: e.toString()));
-    }
+      return false;
+    }, operationName: 'check login status');
+
+    return result.fold(
+      (failure) => Left(failure),
+      (isLoggedIn) => Right(isLoggedIn),
+    );
   }
 
   @override
-  Future<ResultVoid> saveUserData(User user) async {
-    try {
+  Future<Either<Failure, void>> saveUserData(User user) async {
+    final result = await handleVoidException(() async {
       final userModel = UserModel.fromEntity(user);
       await _localDataSource.saveUserData(userModel);
-      return const Right(null);
-    } on CacheException catch (e) {
-      return Left(CacheFailure(message: e.message));
-    } catch (e) {
-      return Left(UnknownFailure(message: e.toString()));
-    }
+    }, operationName: 'save user data');
+
+    return result.fold((failure) => Left(failure), (_) => const Right(null));
   }
 
   @override
-  Future<Result<User?>> getCachedUser() async {
-    try {
+  Future<Either<Failure, User?>> getCachedUser() async {
+    final result = await handleException(() async {
       final cachedUserModel = await _localDataSource.getCachedUser();
-      return Right(cachedUserModel?.toEntity());
-    } on CacheException catch (e) {
-      return Left(CacheFailure(message: e.message));
-    } catch (e) {
-      return Left(UnknownFailure(message: e.toString()));
-    }
+      return cachedUserModel?.toEntity();
+    }, operationName: 'get cached user');
+
+    return result.fold((failure) => Left(failure), (user) => Right(user));
   }
 
   @override
-  Future<ResultVoid> clearUserData() async {
-    try {
+  Future<Either<Failure, void>> clearUserData() async {
+    final result = await handleVoidException(() async {
       await _localDataSource.clearUserData();
-      return const Right(null);
-    } on CacheException catch (e) {
-      return Left(CacheFailure(message: e.message));
-    } catch (e) {
-      return Left(UnknownFailure(message: e.toString()));
-    }
+    }, operationName: 'clear user data');
+
+    return result.fold((failure) => Left(failure), (_) => const Right(null));
   }
 }

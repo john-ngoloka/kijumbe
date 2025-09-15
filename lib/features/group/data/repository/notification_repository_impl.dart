@@ -14,16 +14,13 @@ class NotificationRepositoryImpl extends BaseRepository
 
   @override
   Future<Notification> createNotification(Notification notification) async {
-    final result = await handleException(
-      () async {
-        final notificationModel = NotificationModel.fromEntity(notification);
-        final createdModel = await _notificationDAO.createNotification(
-          notificationModel,
-        );
-        return createdModel.toEntity();
-      },
-      operationName: 'create notification',
-    );
+    final result = await handleException(() async {
+      final notificationModel = NotificationModel.fromEntity(notification);
+      final createdModel = await _notificationDAO.createNotification(
+        notificationModel,
+      );
+      return createdModel.toEntity();
+    }, operationName: 'create notification');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -33,16 +30,13 @@ class NotificationRepositoryImpl extends BaseRepository
 
   @override
   Future<Notification> updateNotification(Notification notification) async {
-    final result = await handleException(
-      () async {
-        final notificationModel = NotificationModel.fromEntity(notification);
-        final updatedModel = await _notificationDAO.updateNotification(
-          notificationModel,
-        );
-        return updatedModel.toEntity();
-      },
-      operationName: 'update notification',
-    );
+    final result = await handleException(() async {
+      final notificationModel = NotificationModel.fromEntity(notification);
+      final updatedModel = await _notificationDAO.updateNotification(
+        notificationModel,
+      );
+      return updatedModel.toEntity();
+    }, operationName: 'update notification');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -57,23 +51,17 @@ class NotificationRepositoryImpl extends BaseRepository
       operationName: 'delete notification',
     );
 
-    result.fold(
-      (failure) => throw Exception(failure.message),
-      (_) => null,
-    );
+    result.fold((failure) => throw Exception(failure.message), (_) => null);
   }
 
   @override
   Future<Notification?> getNotificationById(int notificationId) async {
-    final result = await handleException(
-      () async {
-        final notificationModel = await _notificationDAO.getNotificationById(
-          notificationId,
-        );
-        return notificationModel?.toEntity();
-      },
-      operationName: 'get notification by ID',
-    );
+    final result = await handleException(() async {
+      final notificationModel = await _notificationDAO.getNotificationById(
+        notificationId,
+      );
+      return notificationModel?.toEntity();
+    }, operationName: 'get notification by ID');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -83,14 +71,11 @@ class NotificationRepositoryImpl extends BaseRepository
 
   @override
   Future<List<Notification>> getNotificationsByUserId(int userId) async {
-    final result = await handleException(
-      () async {
-        final notificationModels = await _notificationDAO
-            .getNotificationsByUserId(userId);
-        return notificationModels.map((model) => model.toEntity()).toList();
-      },
-      operationName: 'get notifications by user ID',
-    );
+    final result = await handleException(() async {
+      final notificationModels = await _notificationDAO
+          .getNotificationsByUserId(userId);
+      return notificationModels.map((model) => model.toEntity()).toList();
+    }, operationName: 'get notifications by user ID');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -100,14 +85,11 @@ class NotificationRepositoryImpl extends BaseRepository
 
   @override
   Future<List<Notification>> getUnreadNotificationsByUserId(int userId) async {
-    final result = await handleException(
-      () async {
-        final notificationModels = await _notificationDAO
-            .getUnreadNotificationsByUserId(userId);
-        return notificationModels.map((model) => model.toEntity()).toList();
-      },
-      operationName: 'get unread notifications by user ID',
-    );
+    final result = await handleException(() async {
+      final notificationModels = await _notificationDAO
+          .getUnreadNotificationsByUserId(userId);
+      return notificationModels.map((model) => model.toEntity()).toList();
+    }, operationName: 'get unread notifications by user ID');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -122,10 +104,7 @@ class NotificationRepositoryImpl extends BaseRepository
       operationName: 'mark notification as read',
     );
 
-    result.fold(
-      (failure) => throw Exception(failure.message),
-      (_) => null,
-    );
+    result.fold((failure) => throw Exception(failure.message), (_) => null);
   }
 
   @override
@@ -135,10 +114,7 @@ class NotificationRepositoryImpl extends BaseRepository
       operationName: 'mark all notifications as read',
     );
 
-    result.fold(
-      (failure) => throw Exception(failure.message),
-      (_) => null,
-    );
+    result.fold((failure) => throw Exception(failure.message), (_) => null);
   }
 
   @override

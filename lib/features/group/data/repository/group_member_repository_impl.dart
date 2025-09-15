@@ -14,16 +14,13 @@ class GroupMemberRepositoryImpl extends BaseRepository
 
   @override
   Future<GroupMember> addMemberToGroup(GroupMember groupMember) async {
-    final result = await handleException(
-      () async {
-        final groupMemberModel = GroupMemberModel.fromEntity(groupMember);
-        final addedModel = await _groupMemberDAO.addMemberToGroup(
-          groupMemberModel,
-        );
-        return addedModel.toEntity();
-      },
-      operationName: 'add member to group',
-    );
+    final result = await handleException(() async {
+      final groupMemberModel = GroupMemberModel.fromEntity(groupMember);
+      final addedModel = await _groupMemberDAO.addMemberToGroup(
+        groupMemberModel,
+      );
+      return addedModel.toEntity();
+    }, operationName: 'add member to group');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -38,24 +35,16 @@ class GroupMemberRepositoryImpl extends BaseRepository
       operationName: 'remove member from group',
     );
 
-    result.fold(
-      (failure) => throw Exception(failure.message),
-      (_) => null,
-    );
+    result.fold((failure) => throw Exception(failure.message), (_) => null);
   }
 
   @override
   Future<GroupMember> updateMember(GroupMember groupMember) async {
-    final result = await handleException(
-      () async {
-        final groupMemberModel = GroupMemberModel.fromEntity(groupMember);
-        final updatedModel = await _groupMemberDAO.updateMember(
-          groupMemberModel,
-        );
-        return updatedModel.toEntity();
-      },
-      operationName: 'update member',
-    );
+    final result = await handleException(() async {
+      final groupMemberModel = GroupMemberModel.fromEntity(groupMember);
+      final updatedModel = await _groupMemberDAO.updateMember(groupMemberModel);
+      return updatedModel.toEntity();
+    }, operationName: 'update member');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -65,13 +54,10 @@ class GroupMemberRepositoryImpl extends BaseRepository
 
   @override
   Future<GroupMember?> getMemberById(int memberId) async {
-    final result = await handleException(
-      () async {
-        final groupMemberModel = await _groupMemberDAO.getMemberById(memberId);
-        return groupMemberModel?.toEntity();
-      },
-      operationName: 'get member by ID',
-    );
+    final result = await handleException(() async {
+      final groupMemberModel = await _groupMemberDAO.getMemberById(memberId);
+      return groupMemberModel?.toEntity();
+    }, operationName: 'get member by ID');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -81,15 +67,12 @@ class GroupMemberRepositoryImpl extends BaseRepository
 
   @override
   Future<List<GroupMember>> getMembersByGroupId(int groupId) async {
-    final result = await handleException(
-      () async {
-        final groupMemberModels = await _groupMemberDAO.getMembersByGroupId(
-          groupId,
-        );
-        return groupMemberModels.map((model) => model.toEntity()).toList();
-      },
-      operationName: 'get members by group ID',
-    );
+    final result = await handleException(() async {
+      final groupMemberModels = await _groupMemberDAO.getMembersByGroupId(
+        groupId,
+      );
+      return groupMemberModels.map((model) => model.toEntity()).toList();
+    }, operationName: 'get members by group ID');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -99,15 +82,12 @@ class GroupMemberRepositoryImpl extends BaseRepository
 
   @override
   Future<List<GroupMember>> getMembersByUserId(int userId) async {
-    final result = await handleException(
-      () async {
-        final groupMemberModels = await _groupMemberDAO.getMembersByUserId(
-          userId,
-        );
-        return groupMemberModels.map((model) => model.toEntity()).toList();
-      },
-      operationName: 'get members by user ID',
-    );
+    final result = await handleException(() async {
+      final groupMemberModels = await _groupMemberDAO.getMembersByUserId(
+        userId,
+      );
+      return groupMemberModels.map((model) => model.toEntity()).toList();
+    }, operationName: 'get members by user ID');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -122,23 +102,17 @@ class GroupMemberRepositoryImpl extends BaseRepository
       operationName: 'set payout order',
     );
 
-    result.fold(
-      (failure) => throw Exception(failure.message),
-      (_) => null,
-    );
+    result.fold((failure) => throw Exception(failure.message), (_) => null);
   }
 
   @override
   Future<List<GroupMember>> getMembersByPayoutOrder(int groupId) async {
-    final result = await handleException(
-      () async {
-        final groupMemberModels = await _groupMemberDAO.getMembersByPayoutOrder(
-          groupId,
-        );
-        return groupMemberModels.map((model) => model.toEntity()).toList();
-      },
-      operationName: 'get members by payout order',
-    );
+    final result = await handleException(() async {
+      final groupMemberModels = await _groupMemberDAO.getMembersByPayoutOrder(
+        groupId,
+      );
+      return groupMemberModels.map((model) => model.toEntity()).toList();
+    }, operationName: 'get members by payout order');
 
     return result.fold(
       (failure) => throw Exception(failure.message),

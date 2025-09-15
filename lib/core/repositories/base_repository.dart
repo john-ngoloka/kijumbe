@@ -17,9 +17,7 @@ abstract class BaseRepository {
     } on CacheException catch (e) {
       return Left(CacheFailure(message: e.message));
     } on ServerException catch (e) {
-      return Left(
-        ServerFailure(message: e.message, statusCode: e.statusCode),
-      );
+      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
     } on NetworkException catch (e) {
       return Left(NetworkFailure(message: e.message));
     } on AuthenticationException catch (e) {
@@ -45,9 +43,7 @@ abstract class BaseRepository {
     } on CacheException catch (e) {
       return Left(CacheFailure(message: e.message));
     } on ServerException catch (e) {
-      return Left(
-        ServerFailure(message: e.message, statusCode: e.statusCode),
-      );
+      return Left(ServerFailure(message: e.message, statusCode: e.statusCode));
     } on NetworkException catch (e) {
       return Left(NetworkFailure(message: e.message));
     } on AuthenticationException catch (e) {

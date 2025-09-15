@@ -13,14 +13,11 @@ class PayoutRepositoryImpl extends BaseRepository implements PayoutRepository {
 
   @override
   Future<Payout> recordPayout(Payout payout) async {
-    final result = await handleException(
-      () async {
-        final payoutModel = PayoutModel.fromEntity(payout);
-        final recordedModel = await _payoutDAO.recordPayout(payoutModel);
-        return recordedModel.toEntity();
-      },
-      operationName: 'record payout',
-    );
+    final result = await handleException(() async {
+      final payoutModel = PayoutModel.fromEntity(payout);
+      final recordedModel = await _payoutDAO.recordPayout(payoutModel);
+      return recordedModel.toEntity();
+    }, operationName: 'record payout');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -30,14 +27,11 @@ class PayoutRepositoryImpl extends BaseRepository implements PayoutRepository {
 
   @override
   Future<Payout> updatePayout(Payout payout) async {
-    final result = await handleException(
-      () async {
-        final payoutModel = PayoutModel.fromEntity(payout);
-        final updatedModel = await _payoutDAO.updatePayout(payoutModel);
-        return updatedModel.toEntity();
-      },
-      operationName: 'update payout',
-    );
+    final result = await handleException(() async {
+      final payoutModel = PayoutModel.fromEntity(payout);
+      final updatedModel = await _payoutDAO.updatePayout(payoutModel);
+      return updatedModel.toEntity();
+    }, operationName: 'update payout');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -52,21 +46,15 @@ class PayoutRepositoryImpl extends BaseRepository implements PayoutRepository {
       operationName: 'delete payout',
     );
 
-    result.fold(
-      (failure) => throw Exception(failure.message),
-      (_) => null,
-    );
+    result.fold((failure) => throw Exception(failure.message), (_) => null);
   }
 
   @override
   Future<Payout?> getPayoutById(int payoutId) async {
-    final result = await handleException(
-      () async {
-        final payoutModel = await _payoutDAO.getPayoutById(payoutId);
-        return payoutModel?.toEntity();
-      },
-      operationName: 'get payout by ID',
-    );
+    final result = await handleException(() async {
+      final payoutModel = await _payoutDAO.getPayoutById(payoutId);
+      return payoutModel?.toEntity();
+    }, operationName: 'get payout by ID');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -76,13 +64,10 @@ class PayoutRepositoryImpl extends BaseRepository implements PayoutRepository {
 
   @override
   Future<List<Payout>> getPayoutsByGroupId(int groupId) async {
-    final result = await handleException(
-      () async {
-        final payoutModels = await _payoutDAO.getPayoutsByGroupId(groupId);
-        return payoutModels.map((model) => model.toEntity()).toList();
-      },
-      operationName: 'get payouts by group ID',
-    );
+    final result = await handleException(() async {
+      final payoutModels = await _payoutDAO.getPayoutsByGroupId(groupId);
+      return payoutModels.map((model) => model.toEntity()).toList();
+    }, operationName: 'get payouts by group ID');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -92,13 +77,10 @@ class PayoutRepositoryImpl extends BaseRepository implements PayoutRepository {
 
   @override
   Future<List<Payout>> getPayoutsByMemberId(int memberId) async {
-    final result = await handleException(
-      () async {
-        final payoutModels = await _payoutDAO.getPayoutsByMemberId(memberId);
-        return payoutModels.map((model) => model.toEntity()).toList();
-      },
-      operationName: 'get payouts by member ID',
-    );
+    final result = await handleException(() async {
+      final payoutModels = await _payoutDAO.getPayoutsByMemberId(memberId);
+      return payoutModels.map((model) => model.toEntity()).toList();
+    }, operationName: 'get payouts by member ID');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -108,16 +90,13 @@ class PayoutRepositoryImpl extends BaseRepository implements PayoutRepository {
 
   @override
   Future<List<Payout>> getPayoutsByCycle(int groupId, int cycleNumber) async {
-    final result = await handleException(
-      () async {
-        final payoutModels = await _payoutDAO.getPayoutsByCycle(
-          groupId,
-          cycleNumber,
-        );
-        return payoutModels.map((model) => model.toEntity()).toList();
-      },
-      operationName: 'get payouts by cycle',
-    );
+    final result = await handleException(() async {
+      final payoutModels = await _payoutDAO.getPayoutsByCycle(
+        groupId,
+        cycleNumber,
+      );
+      return payoutModels.map((model) => model.toEntity()).toList();
+    }, operationName: 'get payouts by cycle');
 
     return result.fold(
       (failure) => throw Exception(failure.message),

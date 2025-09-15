@@ -14,16 +14,13 @@ class ContributionRepositoryImpl extends BaseRepository
 
   @override
   Future<Contribution> recordContribution(Contribution contribution) async {
-    final result = await handleException(
-      () async {
-        final contributionModel = ContributionModel.fromEntity(contribution);
-        final recordedModel = await _contributionDAO.recordContribution(
-          contributionModel,
-        );
-        return recordedModel.toEntity();
-      },
-      operationName: 'record contribution',
-    );
+    final result = await handleException(() async {
+      final contributionModel = ContributionModel.fromEntity(contribution);
+      final recordedModel = await _contributionDAO.recordContribution(
+        contributionModel,
+      );
+      return recordedModel.toEntity();
+    }, operationName: 'record contribution');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -33,16 +30,13 @@ class ContributionRepositoryImpl extends BaseRepository
 
   @override
   Future<Contribution> updateContribution(Contribution contribution) async {
-    final result = await handleException(
-      () async {
-        final contributionModel = ContributionModel.fromEntity(contribution);
-        final updatedModel = await _contributionDAO.updateContribution(
-          contributionModel,
-        );
-        return updatedModel.toEntity();
-      },
-      operationName: 'update contribution',
-    );
+    final result = await handleException(() async {
+      final contributionModel = ContributionModel.fromEntity(contribution);
+      final updatedModel = await _contributionDAO.updateContribution(
+        contributionModel,
+      );
+      return updatedModel.toEntity();
+    }, operationName: 'update contribution');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -57,23 +51,17 @@ class ContributionRepositoryImpl extends BaseRepository
       operationName: 'delete contribution',
     );
 
-    result.fold(
-      (failure) => throw Exception(failure.message),
-      (_) => null,
-    );
+    result.fold((failure) => throw Exception(failure.message), (_) => null);
   }
 
   @override
   Future<Contribution?> getContributionById(int contributionId) async {
-    final result = await handleException(
-      () async {
-        final contributionModel = await _contributionDAO.getContributionById(
-          contributionId,
-        );
-        return contributionModel?.toEntity();
-      },
-      operationName: 'get contribution by ID',
-    );
+    final result = await handleException(() async {
+      final contributionModel = await _contributionDAO.getContributionById(
+        contributionId,
+      );
+      return contributionModel?.toEntity();
+    }, operationName: 'get contribution by ID');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -83,14 +71,11 @@ class ContributionRepositoryImpl extends BaseRepository
 
   @override
   Future<List<Contribution>> getContributionsByGroupId(int groupId) async {
-    final result = await handleException(
-      () async {
-        final contributionModels = await _contributionDAO
-            .getContributionsByGroupId(groupId);
-        return contributionModels.map((model) => model.toEntity()).toList();
-      },
-      operationName: 'get contributions by group ID',
-    );
+    final result = await handleException(() async {
+      final contributionModels = await _contributionDAO
+          .getContributionsByGroupId(groupId);
+      return contributionModels.map((model) => model.toEntity()).toList();
+    }, operationName: 'get contributions by group ID');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -100,14 +85,11 @@ class ContributionRepositoryImpl extends BaseRepository
 
   @override
   Future<List<Contribution>> getContributionsByMemberId(int memberId) async {
-    final result = await handleException(
-      () async {
-        final contributionModels = await _contributionDAO
-            .getContributionsByMemberId(memberId);
-        return contributionModels.map((model) => model.toEntity()).toList();
-      },
-      operationName: 'get contributions by member ID',
-    );
+    final result = await handleException(() async {
+      final contributionModels = await _contributionDAO
+          .getContributionsByMemberId(memberId);
+      return contributionModels.map((model) => model.toEntity()).toList();
+    }, operationName: 'get contributions by member ID');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -117,14 +99,12 @@ class ContributionRepositoryImpl extends BaseRepository
 
   @override
   Future<List<Contribution>> getPendingContributions(int groupId) async {
-    final result = await handleException(
-      () async {
-        final contributionModels = await _contributionDAO
-            .getPendingContributions(groupId);
-        return contributionModels.map((model) => model.toEntity()).toList();
-      },
-      operationName: 'get pending contributions',
-    );
+    final result = await handleException(() async {
+      final contributionModels = await _contributionDAO.getPendingContributions(
+        groupId,
+      );
+      return contributionModels.map((model) => model.toEntity()).toList();
+    }, operationName: 'get pending contributions');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
@@ -134,14 +114,12 @@ class ContributionRepositoryImpl extends BaseRepository
 
   @override
   Future<List<Contribution>> getPaidContributions(int groupId) async {
-    final result = await handleException(
-      () async {
-        final contributionModels = await _contributionDAO
-            .getPaidContributions(groupId);
-        return contributionModels.map((model) => model.toEntity()).toList();
-      },
-      operationName: 'get paid contributions',
-    );
+    final result = await handleException(() async {
+      final contributionModels = await _contributionDAO.getPaidContributions(
+        groupId,
+      );
+      return contributionModels.map((model) => model.toEntity()).toList();
+    }, operationName: 'get paid contributions');
 
     return result.fold(
       (failure) => throw Exception(failure.message),
