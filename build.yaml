@@ -1,0 +1,19 @@
+targets:
+  $default:
+    builders:
+      injectable_generator:injectable_builder:
+        enabled: true
+        generate_for:
+          - lib/**
+      freezed:freezed:
+        enabled: true
+        generate_for:
+          - lib/**
+      json_serializable:json_serializable:
+        enabled: true
+        generate_for:
+          - lib/**
+      isar_generator:isar_generator:
+        enabled: true
+        generate_for:
+          - lib/**
