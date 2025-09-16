@@ -13,7 +13,7 @@ import 'features/group/presentation/screens/add_member_screen.dart';
 import 'features/group/presentation/screens/group_detail_screen.dart';
 import 'features/group/presentation/cubit/group_member_cubit.dart';
 import 'features/authentication/domain/entities/user.dart';
-import 'features/authentication/presentation/utils/navigation_helper.dart';
+import 'features/group/data/datasources/local/dao/group_dao.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -62,15 +62,46 @@ class KijumbeApp extends StatelessWidget {
               print(
                 '🏠 MAIN: User ID: ${state.user.id}, Name: ${state.user.firstName}',
               );
-              // SIMPLE TEST: Just navigate directly to member dashboard
-              WidgetsBinding.instance.addPostFrameCallback((_) {
-                print(
-                  '🏠 MAIN: PostFrameCallback executing SIMPLE navigation test',
-                );
-                Navigator.of(context).pushReplacementNamed(
-                  '/member-dashboard',
-                  arguments: state.user,
-                );
+              // Navigate based on user role - check if admin first
+              WidgetsBinding.instance.addPostFrameCallback((_) async {
+                print('🏠 MAIN: PostFrameCallback executing navigation');
+
+                // Simple admin check: if user ID matches any group's adminId
+                try {
+                  final groupDAO = getIt<GroupDAO>();
+                  final adminGroups = await groupDAO.getGroupsByAdminId(
+                    int.parse(state.user.id),
+                  );
+
+                  print(
+                    '🏠 MAIN: Found ${adminGroups.length} admin groups for user',
+                  );
+
+                  if (adminGroups.isNotEmpty) {
+                    print(
+                      '🏠 MAIN: User is admin - navigating to admin dashboard',
+                    );
+                    Navigator.of(
+                      context,
+                    ).pushReplacementNamed('/admin-dashboard');
+                  } else {
+                    print(
+                      '🏠 MAIN: User is not admin - navigating to member dashboard',
+                    );
+                    Navigator.of(context).pushReplacementNamed(
+                      '/member-dashboard',
+                      arguments: state.user,
+                    );
+                  }
+                } catch (e) {
+                  print(
+                    '🏠 MAIN: Error checking admin status: $e - defaulting to member dashboard',
+                  );
+                  Navigator.of(context).pushReplacementNamed(
+                    '/member-dashboard',
+                    arguments: state.user,
+                  );
+                }
               });
               return const Scaffold(
                 body: Center(child: CircularProgressIndicator()),
