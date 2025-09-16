@@ -16,7 +16,13 @@ class CycleCollection {
 
   DateTime? endDate;
 
+  DateTime? deadline;
+
   late bool isActive;
+
+  late double targetAmount;
+
+  late double currentAmount;
 
   CycleCollection();
 
@@ -27,18 +33,24 @@ class CycleCollection {
       cycleNumber: cycleNumber,
       startDate: startDate,
       endDate: endDate,
+      deadline: deadline,
       isActive: isActive,
+      targetAmount: targetAmount,
+      currentAmount: currentAmount,
     );
   }
 
   factory CycleCollection.fromModel(CycleModel model) {
-    final collection = CycleCollection(); 
+    final collection = CycleCollection();
     collection.id = model.id;
     collection.groupId = model.groupId;
     collection.cycleNumber = model.cycleNumber;
     collection.startDate = model.startDate;
     collection.endDate = model.endDate;
+    collection.deadline = model.deadline;
     collection.isActive = model.isActive;
+    collection.targetAmount = model.targetAmount;
+    collection.currentAmount = model.currentAmount;
     return collection;
   }
 }

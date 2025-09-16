@@ -6,7 +6,10 @@ class Cycle extends Equatable {
   final int cycleNumber; // 1st, 2nd, etc.
   final DateTime startDate;
   final DateTime? endDate;
+  final DateTime? deadline; // Contribution deadline
   final bool isActive;
+  final double targetAmount; // Total target for this cycle
+  final double currentAmount; // Current collected amount
 
   const Cycle({
     required this.id,
@@ -14,7 +17,10 @@ class Cycle extends Equatable {
     required this.cycleNumber,
     required this.startDate,
     this.endDate,
+    this.deadline,
     required this.isActive,
+    required this.targetAmount,
+    required this.currentAmount,
   });
 
   @override
@@ -24,6 +30,9 @@ class Cycle extends Equatable {
     cycleNumber,
     startDate,
     endDate,
+    deadline,
     isActive,
+    targetAmount,
+    currentAmount,
   ];
 }

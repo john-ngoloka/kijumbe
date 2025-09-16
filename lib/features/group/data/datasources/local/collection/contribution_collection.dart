@@ -13,11 +13,16 @@ class ContributionCollection {
   @Index()
   late int memberId;
 
+  @Index()
+  late int cycleId;
+
   late double amount;
 
   late DateTime date;
 
   late bool isPaid; // true if paid, false if pending
+
+  String? notes;
 
   ContributionCollection();
 
@@ -26,9 +31,11 @@ class ContributionCollection {
       id: id,
       groupId: groupId,
       memberId: memberId,
+      cycleId: cycleId,
       amount: amount,
       date: date,
       isPaid: isPaid,
+      notes: notes,
     );
   }
 
@@ -37,9 +44,11 @@ class ContributionCollection {
     collection.id = model.id;
     collection.groupId = model.groupId;
     collection.memberId = model.memberId;
+    collection.cycleId = model.cycleId;
     collection.amount = model.amount;
     collection.date = model.date;
     collection.isPaid = model.isPaid;
+    collection.notes = model.notes;
     return collection;
   }
 }

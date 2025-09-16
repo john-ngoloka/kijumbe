@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:injectable/injectable.dart';
 import '../../../../core/errors/failures.dart';
 import '../entities/cycle_entity.dart';
 import '../entities/payout_entity.dart';
@@ -7,6 +8,7 @@ import '../repositories/group_member_repository.dart';
 import '../repositories/contribution_repository.dart';
 import '../repositories/payout_repository.dart';
 
+@injectable
 class ProcessCycleCompletionUseCase {
   final CycleRepository cycleRepository;
   final GroupMemberRepository groupMemberRepository;
@@ -27,7 +29,9 @@ class ProcessCycleCompletionUseCase {
         groupId,
       );
       if (activeCycle == null) {
-        return Left(ServerFailure(message: "No active cycle found for this group"));
+        return Left(
+          ServerFailure(message: "No active cycle found for this group"),
+        );
       }
 
       // Get all members ordered by payout order

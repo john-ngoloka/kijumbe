@@ -102,9 +102,19 @@ class CycleRepositoryImpl extends BaseRepository implements CycleRepository {
   }
 
   @override
-  Future<Cycle> startNewCycle(int groupId, int cycleNumber) async {
+  Future<Cycle> startNewCycle(
+    int groupId,
+    int cycleNumber,
+    double targetAmount,
+    DateTime deadline,
+  ) async {
     final result = await handleException(() async {
-      final cycleModel = await _cycleDAO.startNewCycle(groupId, cycleNumber);
+      final cycleModel = await _cycleDAO.startNewCycle(
+        groupId,
+        cycleNumber,
+        targetAmount,
+        deadline,
+      );
       return cycleModel.toEntity();
     }, operationName: 'start new cycle');
 

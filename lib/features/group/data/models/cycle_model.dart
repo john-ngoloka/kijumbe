@@ -12,7 +12,10 @@ class CycleModel with _$CycleModel {
     @JsonKey(name: 'cycle_number') required int cycleNumber,
     @JsonKey(name: 'start_date') required DateTime startDate,
     @JsonKey(name: 'end_date') DateTime? endDate,
+    @JsonKey(name: 'deadline') DateTime? deadline,
     @JsonKey(name: 'is_active') required bool isActive,
+    @JsonKey(name: 'target_amount') required double targetAmount,
+    @JsonKey(name: 'current_amount') required double currentAmount,
   }) = _CycleModel;
 
   const CycleModel._();
@@ -27,7 +30,10 @@ class CycleModel with _$CycleModel {
       cycleNumber: cycleNumber,
       startDate: startDate,
       endDate: endDate,
+      deadline: deadline,
       isActive: isActive,
+      targetAmount: targetAmount,
+      currentAmount: currentAmount,
     );
   }
 
@@ -38,7 +44,10 @@ class CycleModel with _$CycleModel {
       cycleNumber: cycle.cycleNumber,
       startDate: cycle.startDate,
       endDate: cycle.endDate,
+      deadline: cycle.deadline,
       isActive: cycle.isActive,
+      targetAmount: cycle.targetAmount,
+      currentAmount: cycle.currentAmount,
     );
   }
 }

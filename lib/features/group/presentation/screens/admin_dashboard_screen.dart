@@ -12,6 +12,7 @@ import '../widgets/dashboard/modern_stat_card.dart';
 import '../widgets/dashboard/modern_action_card.dart';
 import '../widgets/dashboard/section_header.dart';
 import '../widgets/dashboard/bottom_app_bar.dart';
+import 'cycle_management_screen.dart';
 
 class AdminDashboardScreen extends StatefulWidget {
   const AdminDashboardScreen({super.key});
@@ -162,10 +163,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           onTap: () => _navigateToAddMember(context),
         ),
         QuickAction(
-          title: 'View Group',
-          icon: Icons.visibility,
+          title: 'Manage Cycles',
+          icon: Icons.repeat,
           color: AppColors.secondary,
-          onTap: () => _navigateToGroupDetail(context),
+          onTap: () => _navigateToCycleManagement(context),
         ),
       ],
     );
@@ -263,10 +264,10 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
             ),
             ActionCardData(
               icon: Icons.repeat,
-              title: 'Start Cycle',
-              subtitle: 'Begin new contribution cycle',
+              title: 'Cycle Management',
+              subtitle: 'Start and manage cycles',
               color: AppColors.primary,
-              onTap: () => _showComingSoon(context, 'Cycle Management'),
+              onTap: () => _navigateToCycleManagement(context),
             ),
             ActionCardData(
               icon: Icons.settings,
@@ -341,6 +342,32 @@ class _AdminDashboardScreenState extends State<AdminDashboardScreen> {
           'groupName': group.name,
           'isAdmin': true, // Admin is viewing their group
         },
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('No group found. Please create a group first.'),
+          backgroundColor: AppColors.error,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+        ),
+      );
+    }
+  }
+
+  void _navigateToCycleManagement(BuildContext context) {
+    final groupState = context.read<GroupCubit>().state;
+    if (groupState is AdminGroupsLoaded && groupState.groups.isNotEmpty) {
+      final group = groupState.groups.first;
+      Navigator.of(context).push(
+        MaterialPageRoute(
+          builder: (context) => CycleManagementScreen(
+            groupId: group.id.toString(),
+            groupName: group.name,
+          ),
+        ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

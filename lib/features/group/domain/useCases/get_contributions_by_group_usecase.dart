@@ -1,8 +1,10 @@
 import 'package:dartz/dartz.dart';
+import 'package:injectable/injectable.dart';
 import '../../../../core/errors/failures.dart';
 import '../entities/contribution_entity.dart';
 import '../repositories/contribution_repository.dart';
 
+@injectable
 class GetContributionsByGroupUseCase {
   final ContributionRepository repository;
 

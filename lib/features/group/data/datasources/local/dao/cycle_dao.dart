@@ -133,7 +133,12 @@ class CycleDAO {
   }
 
   /// Start a new cycle for a group
-  Future<CycleModel> startNewCycle(int groupId, int cycleNumber) async {
+  Future<CycleModel> startNewCycle(
+    int groupId,
+    int cycleNumber,
+    double targetAmount,
+    DateTime deadline,
+  ) async {
     try {
       final isar = await _isar;
 
@@ -160,7 +165,10 @@ class CycleDAO {
         cycleNumber: cycleNumber,
         startDate: DateTime.now(),
         endDate: null,
+        deadline: deadline,
         isActive: true,
+        targetAmount: targetAmount,
+        currentAmount: 0.0,
       );
 
       return await createCycle(newCycle);

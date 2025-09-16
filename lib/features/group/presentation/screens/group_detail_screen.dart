@@ -11,6 +11,7 @@ import '../widgets/dashboard/quick_actions_section.dart';
 import '../widgets/dashboard/modern_stat_card.dart';
 import '../widgets/dashboard/section_header.dart';
 import '../widgets/dashboard/bottom_app_bar.dart';
+import 'contribution_screen.dart';
 
 class GroupDetailScreen extends StatefulWidget {
   final String groupId;
@@ -187,7 +188,7 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
           title: 'Make Contribution',
           icon: Icons.payment,
           color: AppColors.primary,
-          onTap: () => _showComingSoon(context, 'Make Contribution'),
+          onTap: () => _navigateToContribution(context),
         ),
         QuickAction(
           title: 'View History',
@@ -536,6 +537,17 @@ class _GroupDetailScreenState extends State<GroupDetailScreen> {
     Navigator.of(context).pushNamed(
       '/add-member',
       arguments: {'groupId': widget.groupId, 'groupName': widget.groupName},
+    );
+  }
+
+  void _navigateToContribution(BuildContext context) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => ContributionScreen(
+          groupId: widget.groupId,
+          groupName: widget.groupName,
+        ),
+      ),
     );
   }
 

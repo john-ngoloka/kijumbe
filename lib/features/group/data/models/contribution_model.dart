@@ -10,9 +10,11 @@ class ContributionModel with _$ContributionModel {
     required int id,
     @JsonKey(name: 'group_id') required int groupId,
     @JsonKey(name: 'member_id') required int memberId,
+    @JsonKey(name: 'cycle_id') required int cycleId,
     required double amount,
     required DateTime date,
     @JsonKey(name: 'is_paid') required bool isPaid,
+    String? notes,
   }) = _ContributionModel;
 
   const ContributionModel._();
@@ -25,9 +27,11 @@ class ContributionModel with _$ContributionModel {
       id: id,
       groupId: groupId,
       memberId: memberId,
+      cycleId: cycleId,
       amount: amount,
       date: date,
       isPaid: isPaid,
+      notes: notes,
     );
   }
 
@@ -36,9 +40,11 @@ class ContributionModel with _$ContributionModel {
       id: contribution.id,
       groupId: contribution.groupId,
       memberId: contribution.memberId,
+      cycleId: contribution.cycleId,
       amount: contribution.amount,
       date: contribution.date,
       isPaid: contribution.isPaid,
+      notes: contribution.notes,
     );
   }
 }

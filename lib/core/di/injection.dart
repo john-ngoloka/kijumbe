@@ -1,7 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:injectable/injectable.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import '../network/dio_client.dart';
 import '../network/network_info.dart';
 import 'injection.config.dart';
 
@@ -15,7 +14,6 @@ Future<void> configureDependencies() async {
 
   // Core dependencies
   getIt.registerLazySingleton<NetworkInfo>(() => NetworkInfoImpl());
-  getIt.registerLazySingleton<DioClient>(() => DioClient(getIt()));
 
   // Initialize generated dependencies
   getIt.init();

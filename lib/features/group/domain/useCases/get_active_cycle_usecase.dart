@@ -1,8 +1,10 @@
 import 'package:dartz/dartz.dart';
+import 'package:injectable/injectable.dart';
 import '../../../../core/errors/failures.dart';
 import '../entities/cycle_entity.dart';
 import '../repositories/cycle_repository.dart';
 
+@injectable
 class GetActiveCycleUseCase {
   final CycleRepository repository;
 
