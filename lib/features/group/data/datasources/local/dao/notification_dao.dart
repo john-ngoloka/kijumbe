@@ -1,9 +1,11 @@
+import 'package:injectable/injectable.dart';
 import 'package:isar/isar.dart';
 import '../../../../../../core/database/app_database.dart';
 import '../../../../../../core/errors/exceptions.dart';
 import '../../../models/notification_model.dart';
 import '../collection/notification_collection.dart';
 
+@injectable
 class NotificationDAO {
   Future<Isar> get _isar async => await AppDatabase.instance;
 

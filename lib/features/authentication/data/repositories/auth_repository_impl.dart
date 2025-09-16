@@ -25,13 +25,23 @@ class AuthRepositoryImpl extends BaseRepository implements AuthRepository {
     required String name,
   }) async {
     final result = await handleException(() async {
-      // Check if user already exists
-      final userExists = await _localDataSource.userExists(phone);
-      if (userExists) {
-        throw AuthenticationException(
-          message: 'User with this phone number already exists',
-          statusCode: 409,
-        );
+      try {
+        // Check if user already exists
+        final userExists = await _localDataSource.userExists(phone);
+        if (userExists) {
+          throw AuthenticationException(
+            message: 'User with this phone number already exists',
+            statusCode: 409,
+          );
+        }
+      } catch (e) {
+        if (e.toString().contains('IsarError')) {
+          throw AuthenticationException(
+            message: 'Database initialization failed. Please restart the app.',
+            statusCode: 500,
+          );
+        }
+        rethrow;
       }
 
       // Create new user
@@ -45,6 +55,7 @@ class AuthRepositoryImpl extends BaseRepository implements AuthRepository {
             ? name.split(' ').skip(1).join(' ')
             : '',
         profileImage: null,
+        password: password, // Store the password
         createdAt: DateTime.now(),
         updatedAt: DateTime.now(),
         isActive: true,
@@ -86,21 +97,50 @@ class AuthRepositoryImpl extends BaseRepository implements AuthRepository {
     required String phone,
     required String password,
   }) async {
+    print('🔐 AUTH REPOSITORY: Login called with phone: $phone');
     final result = await handleException(() async {
       // Get user from local database
+      print('🔐 AUTH REPOSITORY: Looking up user by phone: $phone');
       final userModel = await _localDataSource.getUserByPhone(phone);
+      print('🔐 AUTH REPOSITORY: User lookup result: ${userModel?.id}');
       if (userModel == null) {
+        print('🔐 AUTH REPOSITORY: User not found for phone: $phone');
         throw AuthenticationException(
           message: 'User not found. Please signup first.',
           statusCode: 404,
         );
       }
 
-      // In a real app, you would verify the password hash here
-      // For simulation, we'll just check if password is not empty
-      if (password.isEmpty) {
+      // Flexible password validation: try provided password first, then phone number
+      bool passwordValid = false;
+
+      // First, try the provided password
+      if (userModel.password != null && userModel.password == password) {
+        passwordValid = true;
+        print('🔐 AUTH REPOSITORY: Login successful with provided password');
+      }
+      // If that fails, try using phone number as password
+      else if (userModel.password != null && userModel.password == phone) {
+        passwordValid = true;
+        print(
+          '🔐 AUTH REPOSITORY: Login successful with phone number as password',
+        );
+      }
+      // If both fail, check if user has no password set (legacy users)
+      else if (userModel.password == null || userModel.password!.isEmpty) {
+        // For users without password, allow login with phone number
+        if (password == phone) {
+          passwordValid = true;
+          print(
+            '🔐 AUTH REPOSITORY: Login successful with phone number (no password set)',
+          );
+        }
+      }
+
+      if (!passwordValid) {
         throw AuthenticationException(
-          message: 'Invalid password',
+          message:
+              'Invalid password. Try your custom password or your phone number.',
           statusCode: 401,
         );
       }

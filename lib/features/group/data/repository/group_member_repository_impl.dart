@@ -29,9 +29,9 @@ class GroupMemberRepositoryImpl extends BaseRepository
   }
 
   @override
-  Future<void> removeMemberFromGroup(int memberId) async {
+  Future<void> removeMemberFromGroup(int groupId, int userId) async {
     final result = await handleVoidException(
-      () => _groupMemberDAO.removeMemberFromGroup(memberId),
+      () => _groupMemberDAO.removeMemberFromGroup(groupId, userId),
       operationName: 'remove member from group',
     );
 

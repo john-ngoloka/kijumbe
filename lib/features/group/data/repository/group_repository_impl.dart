@@ -76,6 +76,45 @@ class GroupRepositoryImpl extends BaseRepository implements GroupRepository {
   }
 
   @override
+  Future<List<Group>> getGroupsByUserId(int userId) async {
+    final result = await handleException(() async {
+      final groupModels = await _groupDAO.getGroupsByUserId(userId);
+      return groupModels.map((model) => model.toEntity()).toList();
+    }, operationName: 'get groups by user ID');
+
+    return result.fold(
+      (failure) => throw Exception(failure.message),
+      (groups) => groups,
+    );
+  }
+
+  @override
+  Future<List<Group>> searchGroups(String query) async {
+    final result = await handleException(() async {
+      final groupModels = await _groupDAO.searchGroups(query);
+      return groupModels.map((model) => model.toEntity()).toList();
+    }, operationName: 'search groups');
+
+    return result.fold(
+      (failure) => throw Exception(failure.message),
+      (groups) => groups,
+    );
+  }
+
+  @override
+  Future<Group> joinGroupByCode(String groupCode, int userId) async {
+    final result = await handleException(() async {
+      final groupModel = await _groupDAO.joinGroupByCode(groupCode, userId);
+      return groupModel.toEntity();
+    }, operationName: 'join group by code');
+
+    return result.fold(
+      (failure) => throw Exception(failure.message),
+      (group) => group,
+    );
+  }
+
+  @override
   Future<List<Group>> getAllGroups() async {
     final result = await handleException(() async {
       final groupModels = await _groupDAO.getAllGroups();

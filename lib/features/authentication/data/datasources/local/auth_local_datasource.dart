@@ -146,14 +146,19 @@ class AuthLocalDataSourceImpl implements AuthLocalDataSource {
   @override
   Future<UserModel?> getUserByPhone(String phone) async {
     try {
+      print('🔐 LOCAL DATA SOURCE: Getting user by phone: $phone');
       final isar = await _isar;
       final userCollection = await isar.users
           .filter()
           .phoneEqualTo(phone)
           .findFirst();
 
+      print(
+        '🔐 LOCAL DATA SOURCE: Found user: ${userCollection?.id} with phone: ${userCollection?.phone}',
+      );
       return userCollection?.toUserModel();
     } catch (e) {
+      print('🔐 LOCAL DATA SOURCE: Error getting user by phone: $e');
       throw CacheException(
         message: 'Failed to get user by phone: ${e.toString()}',
       );

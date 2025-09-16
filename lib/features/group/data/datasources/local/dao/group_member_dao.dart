@@ -1,9 +1,11 @@
+import 'package:injectable/injectable.dart';
 import 'package:isar/isar.dart';
 import '../../../../../../core/database/app_database.dart';
 import '../../../../../../core/errors/exceptions.dart';
 import '../../../models/group_member_model.dart';
 import '../collection/group_member_collection.dart';
 
+@injectable
 class GroupMemberDAO {
   Future<Isar> get _isar async => await AppDatabase.instance;
 
@@ -30,14 +32,16 @@ class GroupMemberDAO {
   }
 
   /// Remove a member from a group
-  Future<void> removeMemberFromGroup(int memberId) async {
+  Future<void> removeMemberFromGroup(int groupId, int userId) async {
     try {
       final isar = await _isar;
 
       await isar.writeTxn(() async {
         await isar.groupMemberCollections
             .filter()
-            .idEqualTo(memberId)
+            .groupIdEqualTo(groupId)
+            .and()
+            .userIdEqualTo(userId)
             .deleteAll();
       });
     } catch (e) {

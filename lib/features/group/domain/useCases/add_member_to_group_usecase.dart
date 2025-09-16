@@ -1,8 +1,10 @@
 import 'package:dartz/dartz.dart';
+import 'package:injectable/injectable.dart';
 import '../../../../core/errors/failures.dart';
 import '../entities/group_member_entity.dart';
 import '../repositories/group_member_repository.dart';
 
+@injectable
 class AddMemberToGroupUseCase {
   final GroupMemberRepository repository;
 

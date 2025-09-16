@@ -13,6 +13,7 @@ class UserModel with _$UserModel {
     @JsonKey(name: 'first_name') required String firstName,
     @JsonKey(name: 'last_name') required String lastName,
     @JsonKey(name: 'profile_image') String? profileImage,
+    String? password, // Add password field
     @JsonKey(name: 'created_at') required DateTime createdAt,
     @JsonKey(name: 'updated_at') required DateTime updatedAt,
     @JsonKey(name: 'is_active') required bool isActive,
@@ -31,6 +32,7 @@ class UserModel with _$UserModel {
       firstName: firstName,
       lastName: lastName,
       profileImage: profileImage,
+      password: password, // Add password field
       createdAt: createdAt,
       updatedAt: updatedAt,
       isActive: isActive,
@@ -45,6 +47,7 @@ class UserModel with _$UserModel {
       firstName: user.firstName,
       lastName: user.lastName,
       profileImage: user.profileImage,
+      password: user.password, // Add password field
       createdAt: user.createdAt,
       updatedAt: user.updatedAt,
       isActive: user.isActive,

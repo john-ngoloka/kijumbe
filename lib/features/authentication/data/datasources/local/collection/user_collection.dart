@@ -11,6 +11,7 @@ class User {
   late String firstName;
   late String lastName;
   late String? profileImage;
+  late String password; // Add password field
   late DateTime createdAt;
   late DateTime updatedAt;
   late bool isActive;
@@ -24,6 +25,7 @@ class User {
     firstName = user.firstName;
     lastName = user.lastName;
     profileImage = user.profileImage;
+    password = user.password ?? ''; // Add password field
     createdAt = user.createdAt;
     updatedAt = user.updatedAt;
     isActive = user.isActive;
@@ -37,6 +39,7 @@ class User {
       firstName: firstName,
       lastName: lastName,
       profileImage: profileImage,
+      password: password, // Add password field
       createdAt: createdAt,
       updatedAt: updatedAt,
       isActive: isActive,

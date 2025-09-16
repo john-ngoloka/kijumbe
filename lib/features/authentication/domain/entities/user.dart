@@ -7,6 +7,7 @@ class User extends Equatable {
   final String firstName;
   final String lastName;
   final String? profileImage;
+  final String? password; // Add password field
   final DateTime createdAt;
   final DateTime updatedAt;
   final bool isActive;
@@ -18,6 +19,7 @@ class User extends Equatable {
     required this.firstName,
     required this.lastName,
     this.profileImage,
+    this.password, // Add password field
     required this.createdAt,
     required this.updatedAt,
     required this.isActive,
@@ -33,6 +35,7 @@ class User extends Equatable {
     firstName,
     lastName,
     profileImage,
+    password, // Add password field
     createdAt,
     updatedAt,
     isActive,

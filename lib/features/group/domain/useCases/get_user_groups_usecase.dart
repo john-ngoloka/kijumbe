@@ -5,14 +5,14 @@ import '../entities/group_entity.dart';
 import '../repositories/group_repository.dart';
 
 @injectable
-class GetGroupsByAdminUseCase {
+class GetUserGroupsUseCase {
   final GroupRepository repository;
 
-  GetGroupsByAdminUseCase(this.repository);
+  GetUserGroupsUseCase(this.repository);
 
-  Future<Either<Failure, List<Group>>> call(int adminId) async {
+  Future<Either<Failure, List<Group>>> call(int userId) async {
     try {
-      final result = await repository.getGroupsByAdminId(adminId);
+      final result = await repository.getGroupsByUserId(userId);
       return Right(result);
     } catch (e) {
       return Left(ServerFailure(message: e.toString()));

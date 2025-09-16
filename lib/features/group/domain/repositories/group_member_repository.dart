@@ -2,7 +2,7 @@ import '../entities/group_member_entity.dart';
 
 abstract class GroupMemberRepository {
   Future<GroupMember> addMemberToGroup(GroupMember groupMember);
-  Future<void> removeMemberFromGroup(int memberId);
+  Future<void> removeMemberFromGroup(int groupId, int userId);
   Future<GroupMember> updateMember(GroupMember groupMember);
   Future<GroupMember?> getMemberById(int memberId);
   Future<List<GroupMember>> getMembersByGroupId(int groupId);

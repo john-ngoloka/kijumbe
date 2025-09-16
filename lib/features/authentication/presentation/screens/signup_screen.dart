@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import '../widgets/login_form.dart';
+import '../widgets/signup_form.dart';
 
-class LoginPage extends StatelessWidget {
-  const LoginPage({super.key});
+class SignupPage extends StatelessWidget {
+  const SignupPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -34,7 +34,7 @@ class LoginPage extends StatelessWidget {
 
               // Title Section
               const Text(
-                'Login Account',
+                'Create Account',
                 style: TextStyle(
                   fontSize: 32,
                   fontWeight: FontWeight.bold,
@@ -44,31 +44,31 @@ class LoginPage extends StatelessWidget {
               ),
               const SizedBox(height: 8),
               const Text(
-                'Welcome Back!',
+                'Sign up to continue',
                 style: TextStyle(fontSize: 16, color: Colors.grey),
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 48),
 
-              // Login Form
-              const LoginForm(),
+              // Signup Form
+              const SignupForm(),
 
               const SizedBox(height: 32),
 
-              // Sign up link
+              // Sign in link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Don't have an account? ",
+                    "Already have an account? ",
                     style: TextStyle(color: Colors.grey.shade600),
                   ),
                   TextButton(
                     onPressed: () {
-                      Navigator.of(context).pushNamed('/signup');
+                      Navigator.of(context).pop();
                     },
                     child: const Text(
-                      'Sign Up',
+                      'Login',
                       style: TextStyle(
                         color: Color(0xFF1E3A8A),
                         fontWeight: FontWeight.w600,

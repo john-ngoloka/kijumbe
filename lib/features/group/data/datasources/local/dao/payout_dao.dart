@@ -1,9 +1,11 @@
+import 'package:injectable/injectable.dart';
 import 'package:isar/isar.dart';
 import '../../../../../../core/database/app_database.dart';
 import '../../../../../../core/errors/exceptions.dart';
 import '../../../models/payout_model.dart';
 import '../collection/payout_collection.dart';
 
+@injectable
 class PayoutDAO {
   Future<Isar> get _isar async => await AppDatabase.instance;
 
